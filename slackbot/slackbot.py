@@ -59,7 +59,7 @@ def lambda_handler(event, context):
         data = {"text": random.choice(commitList)}
 
     # 슬랙 전송
-    slack_url = "https://hooks.slack.com/services/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"
+    slack_url = ""
     headers = {"Content-Type": "application/json"}
 
     slack_req = requests.post(slack_url, data=json.dumps(data), headers=headers)
