@@ -96,6 +96,11 @@ class UserInfo():
     def get_user_id(self):
         user_id = ""
 
+<<<<<<< HEAD
+=======
+        slack_bot = []
+
+>>>>>>> 22b73402caa37b9039180d15729890415000870a
         headers = {
             "Authorization": "Bearer {}".format(self.slack_bot_toekn),
             "Content-Type": "application/x-www-form-urlencoded"
