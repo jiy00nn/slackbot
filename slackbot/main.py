@@ -9,6 +9,7 @@ class UserInfo():
         self.git_user_name = git_user_name
         self.slack_bot_toekn = ""
         self.slack_user_name = slack_user_name
+        self.slack_bot = []
 
     def make_github_query(self):
         headers = {
@@ -95,8 +96,6 @@ class UserInfo():
     def get_user_id(self):
         user_id = ""
 
-        slack_bot = ['USLACKBOT', 'UUF6MUP8T', 'UUS6NGS5A', 'UV18BUR0V', 'UV33PLADD']
-
         headers = {
             "Authorization": "Bearer {}".format(self.slack_bot_toekn),
             "Content-Type": "application/x-www-form-urlencoded"
@@ -106,7 +105,7 @@ class UserInfo():
         if users_data.status_code == 200: # Request code 200 means ok.
             datas = users_data.json()
             for data in datas["members"]:
-                if data["id"] not in slack_bot and data["real_name"] == self.slack_user_name:
+                if data["id"] not in self.slack_bot and data["real_name"] == self.slack_user_name:
                     user_id = data["id"]
         else:
             raise Exception("Query failed to run by returning code of {}. {}".format(users_data.status_code, users_data.json()))
@@ -144,6 +143,6 @@ class UserInfo():
         print(result.json())
 
 if __name__ == "__main__":
-    u = UserInfo(")
+    u = UserInfo("")
     count = u.request_github()
     u.send_dm(count['data']['user']['contributionsCollection']['totalCommitContributions'])
