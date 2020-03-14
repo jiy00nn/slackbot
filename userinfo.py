@@ -1,15 +1,19 @@
-import requests
+import os
 import json
 import random
+import requests
 from datetime import date
 
 class UserInfo():
     def __init__(self, git_token, git_user_name, slack_user_name):
         self.git_token = git_token
         self.git_user_name = git_user_name
-        self.slack_bot_toekn = ""
+        self.slack_bot_token = os.environ['SLACK_BOT_TOKEN']
         self.slack_user_name = slack_user_name
         self.slack_bot = []
+        bots = os.environ['SLACK_BOT']
+        for bot in bots.split(', '):
+            self.slack_bot.append(bot)
 
     def make_github_query(self):
         headers = {
@@ -96,10 +100,8 @@ class UserInfo():
     def get_user_id(self):
         user_id = ""
 
-        slack_bot = []
-
         headers = {
-            "Authorization": "Bearer {}".format(self.slack_bot_toekn),
+            "Authorization": "Bearer {}".format(self.slack_bot_token),
             "Content-Type": "application/x-www-form-urlencoded"
             }
         users_data = requests.get("https://slack.com/api/users.list", headers=headers)
@@ -117,7 +119,7 @@ class UserInfo():
     # 대화 오픈 확인하기
     def slack_conversation_open(self, id):
         headers = {
-            "Authorization": "Bearer {}".format(self.slack_bot_toekn),
+            "Authorization": "Bearer {}".format(self.slack_bot_token),
             "Content-Type": "application/x-www-form-urlencoded"
             }
         data = {"users": id }
@@ -133,7 +135,7 @@ class UserInfo():
     def send_dm(self, count):
         id = self.get_user_id()
         headers = {
-            "Authorization": "Bearer {}".format(self.slack_bot_toekn),
+            "Authorization": "Bearer {}".format(self.slack_bot_token),
             "Content-Type": "application/json; charset=utf-8"
             }
         data = {
@@ -143,8 +145,3 @@ class UserInfo():
 
         result = requests.post("https://slack.com/api/chat.postMessage", headers=headers, data=json.dumps(data))
         print(result.json())
-
-if __name__ == "__main__":
-    u = UserInfo("")
-    count = u.request_github()
-    u.send_dm(count['data']['user']['contributionsCollection']['totalCommitContributions'])
