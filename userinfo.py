@@ -1,8 +1,9 @@
 import os
 import json
+import pytz
 import random
 import requests
-from datetime import date
+from datetime import datetime
 
 class UserInfo():
     def __init__(self, git_token, git_user_name, slack_user_name):
@@ -10,12 +11,15 @@ class UserInfo():
         self.git_user_name = git_user_name
         self.slack_bot_token = os.environ['SLACK_BOT_TOKEN']
         self.slack_user_name = slack_user_name
+        # Slack Bot List는 기존에 만들어둔 Slack Bot에게는 DM을 보내지 않도록 미리 제외하기 위해 사용
         self.slack_bot = []
         bots = os.environ['SLACK_BOT']
         for bot in bots.split(', '):
             self.slack_bot.append(bot)
 
     def make_github_query(self):
+        time = datetime.now(pytz.timezone('Asia/Seoul')).strftime("%Y-%m-%dT%H:%M:%S")
+
         headers = {
         "Authorization": "Bearer {}".format(self.git_token),
         "Content-Type": "application/json", 
@@ -31,7 +35,7 @@ class UserInfo():
             }}
         }}
         }}
-        """.format(self.git_user_name, date.today().strftime("%Y-%m-%dT%H:%M:%S"), date.today().strftime("%Y-%m-%dT%H:%M:%S"))
+        """.format(self.git_user_name, time, time)
 
         return headers, query
 
