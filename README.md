@@ -37,8 +37,8 @@ Github의 Commit 정보를 가져오기 위해서 아래의 항목을 체크한 
 1. userinfo.csv 파일에는 github와 slack 정보가 들어있습니다.
     - userinfo.csv 파일내의 데이터 구조는 다음과 같습니다.
         ```
-            user1_github_token, user1_github_username, user1_slack_name
-            user2_github_token, user2_github_username, user2_slack_name
+        user1_github_token, user1_github_username, user1_slack_name
+        user2_github_token, user2_github_username, user2_slack_name
         ```
 
 2. AWS Lambda 함수의 환경 변수 2가지를 추가합니다.
