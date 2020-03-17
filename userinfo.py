@@ -9,13 +9,8 @@ class UserInfo():
     def __init__(self, git_token, git_user_name, slack_user_name):
         self.git_token = git_token
         self.git_user_name = git_user_name
-        self.slack_bot_token = os.environ['SLACK_BOT_TOKEN']
+        self.slack_bot_token = ""
         self.slack_user_name = slack_user_name
-        # Slack Bot List는 기존에 만들어둔 Slack Bot에게는 DM을 보내지 않도록 미리 제외하기 위해 사용
-        self.slack_bot = []
-        bots = os.environ['SLACK_BOT']
-        for bot in bots.split(', '):
-            self.slack_bot.append(bot)
 
     def make_github_query(self):
         time = datetime.now(pytz.timezone('Asia/Seoul')).strftime("%Y-%m-%dT%H:%M:%S")
@@ -113,12 +108,12 @@ class UserInfo():
         if users_data.status_code == 200: # Request code 200 means ok.
             datas = users_data.json()
             for data in datas["members"]:
-                if data["id"] not in self.slack_bot and data["real_name"] == self.slack_user_name:
-                    user_id = data["id"]
+                if data["real_name"] == self.slack_user_name:
+                    return data["id"]
         else:
             raise Exception("Query failed to run by returning code of {}. {}".format(users_data.status_code, users_data.json()))
         
-        return user_id
+        
 
     # 대화 오픈 확인하기
     def slack_conversation_open(self, id):
@@ -136,16 +131,25 @@ class UserInfo():
         else:
             raise Exception("Query failed to run by returning code of {}. {}".format(open_status.status_code, open_status.json()))
 
+    def slack_conversation_close(self, channel):
+        headers = {
+            "Authorization": "Bearer {}".format(self.slack_bot_token),
+            "Content-Type": "application/x-www-form-urlencoded"
+            }
+        data = {"channel": channel }
+
     def send_dm(self, count):
         id = self.get_user_id()
+        channel = self.slack_conversation_open(id)
         headers = {
             "Authorization": "Bearer {}".format(self.slack_bot_token),
             "Content-Type": "application/json; charset=utf-8"
             }
         data = {
-            "channel": f"{self.slack_conversation_open(id)}",
+            "channel": f"{channel}",
             "blocks": f"{self.make_message(count, id)}"
             }
 
         result = requests.post("https://slack.com/api/chat.postMessage", headers=headers, data=json.dumps(data))
-        print(result.json())
+
+        self.slack_conversation_close(channel)
