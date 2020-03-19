@@ -1,47 +1,15 @@
 import os
 import json
-import pytz
 import random
 import requests
-from datetime import datetime
 
-class UserInfo():
+from github import GitHub
+
+class SlackDM(GitHub):
     def __init__(self, git_token, git_user_name, slack_user_name):
-        self.git_token = git_token
-        self.git_user_name = git_user_name
-        self.slack_bot_token = ""
+        GitHub.__init__(self, git_token, git_user_name)
+        self.slack_bot_token = os.environ['SLACK_BOT_TOKEN']
         self.slack_user_name = slack_user_name
-
-    def make_github_query(self):
-        time = datetime.now(pytz.timezone('Asia/Seoul')).strftime("%Y-%m-%dT%H:%M:%S")
-
-        headers = {
-        "Authorization": "Bearer {}".format(self.git_token),
-        "Content-Type": "application/json", 
-        "Accept": "application/vnd.github.inertia-preview+json"
-        }
-
-        # Graphql query 엑세스 값
-        query = """
-        query{{
-        user(login: "{0}") {{
-            contributionsCollection(from: "{1}", to: "{2}") {{
-            totalCommitContributions
-            }}
-        }}
-        }}
-        """.format(self.git_user_name, time, time)
-
-        return headers, query
-
-    def request_github(self):
-        # GitHub Request
-        headers, query = self.make_github_query()
-        git_response = requests.post("https://api.github.com/graphql", json={'query':query}, headers=headers)
-        if git_response.status_code == 200: # Request code 200 means ok.
-            return git_response.json()
-        else:
-            raise Exception("Query failed to run by returning code of {}. {}".format(git_response.status_code, query))
     
     def make_message(self, count, user_id):
         # 커밋을 하나 이상 했을 경우의 메시지
@@ -111,9 +79,7 @@ class UserInfo():
                 if data["real_name"] == self.slack_user_name:
                     return data["id"]
         else:
-            raise Exception("Query failed to run by returning code of {}. {}".format(users_data.status_code, users_data.json()))
-        
-        
+            raise Exception("Query failed to run by returning code of {}. {}".format(users_data.status_code, users_data.json())) 
 
     # 대화 오픈 확인하기
     def slack_conversation_open(self, id):
