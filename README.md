@@ -9,7 +9,7 @@
 
 ### **[ Github token ]**
 Github의 Commit 정보를 가져오기 위해서 아래의 항목을 체크한 뒤 Token을 발행합니다.
-1. [Github Setting 메뉴] Developer settings > Personal access tokens  
+1. [Github User의 Settings 메뉴] Developer settings > Personal access tokens  
     - [ ] repo  
         - [X] repo:status  
     - [ ] user  
