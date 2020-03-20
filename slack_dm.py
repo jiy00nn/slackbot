@@ -75,12 +75,14 @@ class SlackDM(GitHub):
         
         if users_data.status_code == 200: # Request code 200 means ok.
             datas = users_data.json()
-            for data in datas["members"]:
-                if data["real_name"] == self.slack_user_name:
-                    return data["id"]
         else:
             raise Exception("Query failed to run by returning code of {}. {}".format(users_data.status_code, users_data.json())) 
-
+        
+        for data in datas["members"]:
+            if data["deleted"] == False:
+                if data["real_name"] == self.slack_user_name:
+                    return data["id"]
+                    
     # 대화 오픈 확인하기
     def slack_conversation_open(self, id):
         headers = {
