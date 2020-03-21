@@ -21,7 +21,9 @@ class GitHub():
         query{{
         user(login: "{0}") {{
             contributionsCollection(from: "{1}", to: "{2}") {{
-            totalCommitContributions
+                contributionCalendar{{
+                    totalContributions
+              }}
             }}
         }}
         }}
