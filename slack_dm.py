@@ -95,9 +95,11 @@ class SlackDM(GitHub):
         
         if open_status.status_code == 200: # Request code 200 means ok.
             data = open_status.json()
-            return data["channel"]["id"]
-        else:
-            raise Exception("Query failed to run by returning code of {}. {}".format(open_status.status_code, open_status.json()))
+            if data["ok"] == True:
+                try:
+                    return data["channel"]["id"]
+                except:
+                    raise Exception("Query failed to run by returning code of {}. {}".format(open_status.status_code, open_status.json()))
 
     def slack_conversation_close(self, channel):
         headers = {
